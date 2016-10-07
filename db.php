@@ -6,7 +6,7 @@ class DB
 	{
 		return self::getDB()->beginTransaction();
 	}
-	public static function commit($commit)
+	public static function commit($commit = true)
 	{
 		if (!$commit) {
 			echo '[db rollback]' . "\n";
