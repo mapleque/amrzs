@@ -36,15 +36,9 @@ class ClassLoader
 	 */
 	public static function classLoaderCallback($class_name)
 	{
-		// 这里使用映射的目的
-		// 1.是为了按需加载
-		// 2.是为了清楚的指定类对应的文件
-		// TODO 优化方案:
-		// 1.可以考虑实现一个直接由类名查找文件的方法
-		// 2.可以考虑实现"约定大于配置"策略
 		$file = self::$class_map[$class_name];
 		if (isset($file)) {
-			include dirname(__FILE__) . '/../core/' . $file . '.php';
+			include dirname(__FILE__) . '/../../core/' . $file . '.php';
 		} else {
 			return false;
 		}
@@ -56,11 +50,11 @@ class ClassLoader
 	 * @var array
 	 */
 	private static $class_map = [
-		'Important'			=> '../config/important',
+		'Important'			=> '../../important',
 
-		'DB'			    => '../common/db',
-		'DBConn'			=> '../common/db_conn',
+		'DB'			    => '../vendor/amrzs/db',
+		'DBConn'			=> '../vendor/amrzs/db_conn',
 
-		'Base'			    => '../common/base',
+		'Base'			    => '../vendor/amrzs/base',
 	];
 }
