@@ -4,7 +4,13 @@ A php web frame work.
 
 ## Usage
 
-First of or, include this module:
+First of all, download codes in your project vendor.
+```
+// in your project root path
+git clone https://github.com/mapleque/amrzs.git ./vendor/amrzs
+```
+
+Then include it:
 ```
 <?php
 
@@ -19,7 +25,7 @@ Code as follow if there is a new class:
 ```
 <?php
 
-...
+// ...
 
 ClassLoader::appendMap([
     'YourClassName' => 'yourPHPFile', // the file name without .php
@@ -32,7 +38,7 @@ If you want to use Mysql, just use a static method:
 ```
 <?php
 
-...
+// ...
 
 $ret = DB::select('SELECT * FROM tmp_table WHERE id = ?', [1]);
 // the $ret is array map of the result, such as:
@@ -73,7 +79,7 @@ Edit your api file:
 // example.php
 <?php
 
-...
+// ...
 
 $req = Base::getRequestJson();
 
@@ -88,10 +94,26 @@ Base::dieWithResponse([ 'result' => "$req['str']:$req['num']" ]);
 
 Send request by ajax:
 ```
+$.ajax(
+    url:'/example.php',
+    type:'POST',
+    dataType:'json',
+    data:{data:JSON.stringify({
+                str:'rand_str',
+                num: 5
+            })},
+    success:function(res){
+        // fetch res
+    }
+);
 ```
 
 The response received:
 ```
+{
+    status:0,
+    data:{result:'rand_str:5'}
+}
 ```
 
 ## Assert
