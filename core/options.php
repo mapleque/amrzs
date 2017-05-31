@@ -36,3 +36,9 @@ assert_options(ASSERT_CALLBACK, 'amrzs_assert_handler');
 function amrzs_assert_handler($file, $line, $code, $desc = '') {
     Base::dieWithError(ERROR_KNOWN, $desc);
 }
+
+
+if (Important::DEBUG) {
+    error_reporting(E_ALL^E_NOTICE^E_WARNING);
+    ini_set('display_errors',1);
+}

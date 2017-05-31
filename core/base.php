@@ -29,14 +29,16 @@ class Base
 		return $json;
 	}
 
-	public static function dieWithError($err, $errmsg = null)
+	public static function dieWithError($err = ERROR_UNKNOWN, $msg = null)
 	{
-		$json = json_encode(array_merge([ 'status' => $err ], ($errmsg) ? [ 'err' => $errmsg ] : []));
+        header('Content-type:text/json');
+		$json = json_encode(array_merge([ 'status' => $err ], ($msg) ? [ 'err' => $msg ] : []));
 		die($json);
 	}
 
 	public static function dieWithResponse($obj = null)
 	{
+        header('Content-type:text/json');
 		$json = json_encode(array_merge([ 'status' => ERROR_SUCCESS ], ($obj !== null) ? [ 'data' => $obj ] : []));
 		echo $json;
 		die();

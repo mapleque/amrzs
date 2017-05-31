@@ -7,9 +7,11 @@ class Param
     // expr define
     // const IS_STRING = '|@is_string|';
     // const IS_INT = '|@is_int|';
+    const IS_INT_RANGE = '|@check_int_range|';
+    const IS_DATE_RANGE = '|@check_date_range|';
 
     /**
-     * @param function $callback
+     * @param mixed $callback
      * @return string <expr>
      */
     public static function func($callback)
@@ -35,6 +37,11 @@ class Param
     public static function isInt($min = -1, $max = -1)
     {
         return self::wrap('|@check_int:$,$|', $min, $max);
+    }
+
+    public static function isSort($fields)
+    {
+        return self::wrap('@check_sort:$', $fields);
     }
 
     /**

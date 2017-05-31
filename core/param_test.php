@@ -124,6 +124,34 @@ $test_suites = [
             ],
         ],
     ],
+    // filter, sort, range
+    [
+        'rule' => [
+            'filter' => [[
+                'id' => Param::isInt(1,10) . 10001,
+                'date' => Param::IS_DATE_RANGE . 10004,
+            ]],
+            'sort' => Param::isSort([ 'id' ]) . 10002,
+            'range' => Param::IS_INT_RANGE . 10003,
+        ],
+        'cases' => [
+            [
+                'data' => [
+                    'filter' => [
+                        [
+                            'id' => 1,
+                            'date' => ['2017-05-01', '2017-07-01'],
+                        ]
+                    ],
+                    'sort' => [
+                        'id' => true,
+                    ],
+                    'range' => [0,1],
+                ],
+                'status' => 0,
+            ],
+        ],
+    ],
 ];
 
 function test($rule, $param, $status)

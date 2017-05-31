@@ -38,7 +38,7 @@ class ClassLoader
 	{
 		$file = self::$class_map[$class_name];
 		if (isset($file)) {
-			include dirname(__FILE__) . '/../../core/' . $file . '.php';
+			include dirname(__FILE__) . '/../../../core/' . $file . '.php';
 		} else {
 			return false;
 		}
@@ -50,11 +50,11 @@ class ClassLoader
 	 * @var array
 	 */
 	private static $class_map = [
-		'Important'			=> '../../important',
+		'Important'			=> '../important',
 
-		'DB'			    => '../vendor/amrzs/db',
-		'DBConn'			=> '../vendor/amrzs/db_conn',
+		'DB'			    => '../vendor/amrzs/core/db',
+		'DBConn'			=> '../vendor/amrzs/core/db_conn',
 
-		'Base'			    => '../vendor/amrzs/base',
+		'Base'			    => '../vendor/amrzs/core/base',
 	];
 }

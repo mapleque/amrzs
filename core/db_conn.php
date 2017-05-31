@@ -49,19 +49,45 @@ class DBConn extends mysqli
 
 		$variables = [];
 		$temp_data = [];
+		$type_data = [];
 
 		$metadata = $select_stmt->result_metadata();
 		for ($field = $metadata->fetch_field();
-				$field ; $field = $metadata->fetch_field())
-			$variables[] = &$temp_data[$field->name];
+				$field ; $field = $metadata->fetch_field()) {
+            $variables[] = &$temp_data[$field->name];
+            switch ($field->type) {
+                case MYSQLI_TYPE_BIT:
+                case MYSQLI_TYPE_TINY:
+                case MYSQLI_TYPE_SHORT:
+                case MYSQLI_TYPE_LONG:
+                case MYSQLI_TYPE_LONGLONG:
+                case MYSQLI_TYPE_INT24:
+                    $type_data[$field->name] = 'int';
+                    break;
+                case MYSQLI_TYPE_FLOAT:
+                case MYSQLI_TYPE_DOUBLE:
+                case MYSQLI_TYPE_DECIMAL:
+                case MYSQLI_TYPE_NEWDECIMAL:
+                    $type_data[$field->name] = 'float';
+                    break;
+                default:
+                    $type_date[$field->name] = null;
+
+            }
+        }
 		call_user_func_array([ $select_stmt, 'bind_result' ], $variables);
 
 		$result = [];
 		while ($select_stmt->fetch()) {
 			$obj = [];
 			foreach ($temp_data as $k => $v) {
-				$obj[$k] = $v;
-			}
+			    /*
+			    if ($type_data[$k] !== null) {
+                    settype($v, $type_data[$k]);
+                }
+			    */
+                $obj[$k] = $v;
+            }
 			$result[] = $obj;
 		}
 
