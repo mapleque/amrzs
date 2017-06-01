@@ -14,6 +14,15 @@ require __DIR__ . '/../include.php';
  *      status => $status
  * ]
  */
+define('DEF_TEST_1', 1);
+define('DEF_TEST_2', 2);
+define('DEF_TEST_3', 3);
+define('DEF_TEST_4', 4);
+define('DEF_TEST_5', 5);
+define('DEF_TEST_6', 6);
+define('DEF_TEST_7', 7);
+
+
 $test_suites = [
     // empty case should pass forever
     [
@@ -90,6 +99,38 @@ $test_suites = [
             ],
         ],
     ],
+    // isBool
+    [
+        'rule' => [
+            'int' => Param::IS_BOOLEAN . 30001,
+        ],
+        'cases' => [
+            [
+                'data' => [
+                    'int' => true,
+                ],
+                'status' => 30001,
+            ],
+            [
+                'data' => [
+                    'int' => 'abcde',
+                ],
+                'status' => 30001,
+            ],
+            [
+                'data' => [
+                    'int' => 1,
+                ],
+                'status' => 0,
+            ],
+            [
+                'data' => [
+                    'int' => 0,
+                ],
+                'status' => 0,
+            ],
+        ],
+    ],
     // func
     [
         'rule' => [
@@ -152,6 +193,118 @@ $test_suites = [
             ],
         ],
     ],
+    // optional
+    [
+        'rule' => [
+            'int' => Param::OPTIONAL . Param::isInt(1,10) . 30001,
+        ],
+        'cases' => [
+            [
+                'data' => [
+                    'int' => 5,
+                ],
+                'status' => 0,
+            ],
+            [
+                'data' => [],
+                'status' => 0,
+            ],
+        ],
+    ],
+    // optional
+    [
+        'rule' => [
+            'filter' => [[
+                'int' => Param::OPTIONAL . Param::isInt(1,10) . 30001,
+            ]],
+        ],
+        'cases' => [
+            [
+                'data' => [
+                    'filter' => [[
+                        'int' => 5,
+                    ]]
+                ],
+                'status' => 0,
+            ],
+            [
+                'data' => [
+                    'filter' => [],
+                ],
+                'status' => 0,
+            ],
+        ],
+    ],
+    // enum
+    [
+        'rule' => [
+            'enum' => Param::isEnum('DEF_TEST_') . 30001,
+        ],
+        'cases' => [
+            [
+                'data' => [
+                    'enum' => 5,
+                ],
+                'status' => 0,
+            ],
+            [
+                'data' => [
+                    'enum' => 15,
+                ],
+                'status' => 30001,
+            ],
+            [
+                'data' => [
+                    'enum' => 'a',
+                ],
+                'status' => 30001,
+            ],
+        ],
+    ],
+    // enum subset
+    [
+        'rule' => [
+            'enum' => Param::isEnumSubset('DEF_TEST_') . 30001,
+        ],
+        'cases' => [
+            [
+                'data' => [
+                    'enum' => [5],
+                ],
+                'status' => 0,
+            ],
+            [
+                'data' => [
+                    'enum' => 5,
+                ],
+                'status' => 30001,
+            ],
+            [
+                'data' => [
+                    'enum' => [5,15],
+                ],
+                'status' => 30001,
+            ],
+        ],
+    ],
+    // filter trans
+    [
+        'rule' => [
+            'filter' => [[
+                'id' => Param::IS_ID . Param::filter() . 30001,
+            ]]
+        ],
+        'cases' => [
+            [
+                'data' =>[
+                    'filter' => [[
+                        'id' => 1
+                    ]]
+                ],
+                'status' => 0
+            ]
+        ]
+    ],
 ];
 
 function test($rule, $param, $status)
@@ -165,7 +318,7 @@ function test($rule, $param, $status)
             'expect' => $status,
             'real' => $real,
         ]);
-        echo '[FAILD] case faild!'. "\n";
+        echo '[FAIL] case faild!'. "\n";
         die;
     }
 }

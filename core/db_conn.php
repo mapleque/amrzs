@@ -12,7 +12,7 @@ class DBConn extends mysqli
 		$err = parent::real_connect($addr, $user, $pass, $db, $port,
 									null, MYSQLI_CLIENT_FOUND_ROWS);
 		error_reporting($error_level);
-
+        mysqli_query($this,'set names utf8');
 		if ($this->connect_error) {
 			var_dump([ 'error', $this->connect_err ]);
 		}

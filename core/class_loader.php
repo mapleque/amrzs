@@ -54,6 +54,7 @@ class ClassLoader
 
 		'DB'			    => '../vendor/amrzs/core/db',
 		'DBConn'			=> '../vendor/amrzs/core/db_conn',
+        'DBHelper'          => '../vendor/amrzs/core/db_helper',
 
 		'Base'			    => '../vendor/amrzs/core/base',
 	];

@@ -4,11 +4,18 @@ class Param
 {
     private static $runtime_cache = [];
 
+    const OPTIONAL = '|o|';
+
     // expr define
-    // const IS_STRING = '|@is_string|';
-    // const IS_INT = '|@is_int|';
+    const IS_ID = '|@check_id|';
     const IS_INT_RANGE = '|@check_int_range|';
     const IS_DATE_RANGE = '|@check_date_range|';
+    const IS_BOOLEAN = '|@check_bool|';
+
+    public static function filter($table = null)
+    {
+        return self::wrap('|#trans_filter:$|', $table);
+    }
 
     /**
      * @param mixed $callback
@@ -16,7 +23,7 @@ class Param
      */
     public static function func($callback)
     {
-        return self::wrap('|@callback:$|', $callback);
+        return self::wrap('|@check_callback:$|', $callback);
     }
 
     /**
@@ -41,9 +48,18 @@ class Param
 
     public static function isSort($fields)
     {
-        return self::wrap('@check_sort:$', $fields);
+        return self::wrap('|@check_sort:$|', $fields);
     }
 
+    public static function isEnum($prefix)
+    {
+        return self::wrap('|@check_enum:$|', $prefix);
+    }
+
+    public static function isEnumSubset($prefix)
+    {
+        return self::wrap('|@check_enum_subset:$|', $prefix);
+    }
     /**
      * @param string $expr
      * @param ...
@@ -66,7 +82,7 @@ class Param
      * @param array $rule
      * @param array $param
      */
-    public static function checkAndDie($rule, $param, $debug = false)
+    public static function checkAndDie($rule, &$param, $debug = false)
     {
         $status = self::check($rule, $param, $debug);
         if ($status != ERROR_SUCCESS) {
@@ -77,10 +93,11 @@ class Param
     /**
      * @param $rule
      * @param $param
+     * @param $debug = false
      * @return int =0 success
      *             >0 error status
      */
-    public static function check($rule, $param, $debug = false)
+    public static function check($rule, &$param, $debug = false)
     {
         if ($debug) {
             dump([
@@ -90,6 +107,9 @@ class Param
             ]);
         }
         if (is_array($rule)) {
+            if (!$param) {
+                $param = [];
+            }
             if (!is_array($param)) {
                 return ERROR_INVALID_REQUEST;
             }
@@ -102,24 +122,21 @@ class Param
         } elseif (is_string($rule)) {
             $rule_info = self::process($rule);
 
-            // a lost a must param
-            if (!$rule_info['optional'] && !isset($param)) {
-                if ($debug) {
-                    dump([
-                        'msg' => 'check faild',
-                        'rule' => $rule,
-                        'value' => $param,
-                        'rule_info' => $rule_info,
-                    ]);
-                }
-                return $rule_info['code'];
+            // lost a must param
+            if ($rule_info['optional'] && !isset($param)) {
+                return ERROR_SUCCESS;
             }
 
             // a function check
-            if ($rule_info['func'] !== null) {
-                if (!$rule_info['func']($debug, $param, $rule_info['args'])) {
+            if ($rule_info['check'] !== null) {
+                if (!$rule_info['check']($debug, $param, $rule_info['args'])) {
                     return $rule_info['code'];
                 }
+            }
+
+            // function transform
+            if ($rule_info['trans'] !== null) {
+                $rule_info['trans']($debug, $param, $rule_info);
             }
 
         }
@@ -128,16 +145,17 @@ class Param
 
     /**
      * @param string $rule
-     * @return int =0 success
-     *             >0 error status
+     * @return array
      */
     private static function process($rule)
     {
         $rule_info = [
             'optional' => false,
-            'func' => null,
+            'check' => null,
             'args' => [],
             'code' => ERROR_SUCCESS,
+            'trans_args' => [],
+            'trans' => null,
         ];
         foreach (explode('|', $rule) as $expr) {
             if ($expr == '') {
@@ -150,12 +168,23 @@ class Param
             case '@':
                 $wrap_pos = strpos($expr, ':');
                 if ($wrap_pos !== false) {
-                    $rule_info['func'] = substr($expr, 1, $wrap_pos - 1);
+                    $rule_info['check'] = substr($expr, 1, $wrap_pos - 1);
                     foreach (explode(',', substr($expr, $wrap_pos + 1)) as $idx) {
                         $rule_info['args'][] = self::$runtime_cache[(int)$idx];
                     }
                 } else {
-                    $rule_info['func'] = substr($expr, 1);
+                    $rule_info['check'] = substr($expr, 1);
+                }
+                break;
+            case '#':
+                $wrap_pos = strpos($expr, ':');
+                if ($wrap_pos !== false) {
+                    $rule_info['trans'] = substr($expr, 1, $wrap_pos - 1);
+                    foreach (explode(',', substr($expr, $wrap_pos + 1)) as $idx) {
+                        $rule_info['trans_args'][] = self::$runtime_cache[(int)$idx];
+                    }
+                } else {
+                    $rule_info['trans'] = substr($expr, 1);
                 }
                 break;
             default :
