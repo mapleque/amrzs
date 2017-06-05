@@ -2,6 +2,8 @@
 
 class Important
 {
+    const DEBUG = true;
+
     const DB_ADDR = '127.0.0.1';
     const DB_PORT = 3306;
     const DB_USER = 'username';
