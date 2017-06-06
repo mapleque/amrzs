@@ -7,7 +7,7 @@ A php web frame work.
 First of all, download codes in your project vendor.
 ```
 // in your project root path
-git clone https://github.com/mapleque/amrzs.git ./vendor/amrzs
+git clone https://git.lcgc.work/dw/amrzs.git ./vendor/amrzs
 ```
 
 Then include it:
