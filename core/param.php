@@ -12,9 +12,9 @@ class Param
     const IS_DATE_RANGE = '|@check_date_range|';
     const IS_BOOLEAN = '|@check_bool|';
 
-    public static function filter($table = null)
+    public static function filter($table = null, $alias = null)
     {
-        return self::wrap('|#trans_filter:$|', $table);
+        return self::wrap('|#trans_filter:$,$|', $table, $alias);
     }
 
     /**
@@ -81,6 +81,7 @@ class Param
     /**
      * @param array $rule
      * @param array $param
+     * @param bool $debug
      */
     public static function checkAndDie($rule, &$param, $debug = false)
     {
@@ -93,11 +94,12 @@ class Param
     /**
      * @param $rule
      * @param $param
+     * @param $parentKey
      * @param $debug = false
      * @return int =0 success
      *             >0 error status
      */
-    public static function check($rule, &$param, $debug = false)
+    public static function check($rule, &$param, $parentKey = null, $debug = false)
     {
         if ($debug) {
             dump([
@@ -114,7 +116,13 @@ class Param
                 return ERROR_INVALID_REQUEST;
             }
             foreach ($rule as $key => $value) {
-                $status = self::check($value, $param[$key], $debug);
+                if (array_key_exists($key, $param)) {
+                    $status = self::check($value, $param[$key], $key, $debug);
+                } else {
+                    $tmp = null;
+                    $status = self::check($value, $tmp, $key, $debug);
+                    unset($tmp);
+                }
                 if ($status != ERROR_SUCCESS) {
                     return $status;
                 }
@@ -136,7 +144,7 @@ class Param
 
             // function transform
             if ($rule_info['trans'] !== null) {
-                $rule_info['trans']($debug, $param, $rule_info);
+                $rule_info['trans']($debug, $param, $rule_info, $parentKey);
             }
 
         }

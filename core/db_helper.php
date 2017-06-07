@@ -14,7 +14,7 @@ class DBHelper
                 continue;
             }
             $sql .= ($sql === ''? ' ' : ' AND ')
-                . str_replace('<$>', $v['table'] === null ? $k : ($v['table'] . '.' . $k), $v['expr']);
+                . $v['expr'];
             $bind = array_merge($bind, $v['bind']);
         }
         return ($sql === '' ? '' : ' WHERE') . $sql;

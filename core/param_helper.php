@@ -1,22 +1,37 @@
 <?php
 
-function trans_filter($debug, &$param, $ruleInfo)
+function trans_filter($debug, &$param, $ruleInfo, $parentKey)
 {
     $table = $ruleInfo['trans_args'][0];
-    $expr = '<$> = ?';
+    $alias = $ruleInfo['trans_args'][1];
+    $row = $alias === null ? $parentKey : $alias;
+    $field = $table === null ? $row : ( $table . '.' . $row);
+    $expr = $field . ' = ?';
     $bind = [ $param ];
     if (strpos($ruleInfo['check'], 'subset') !== false) {
-        $expr = '<$> IN (' . str_repeat('?', count($param)) . ')';
+        $expr = $field . ' IN (' . str_repeat('?', count($param)) . ')';
         $bind = $param;
     } elseif (strpos($ruleInfo['check'], 'range') !== false) {
-        $expr = '<$> <= ? AND <$> >= ?';
+        $expr = $field . ' <= ? AND ' . $field . ' >= ?';
         $bind = $param;
     }
     $param = [
-        'table' => $table,
         'bind' => $bind,
         'expr' => $expr,
+        'key' => $parentKey,
+        'value' => $param,
     ];
+}
+
+function decode_filter($filter)
+{
+    $ret = [];
+    foreach ($filter as $key => $value) {
+        if (isset($value)) {
+            $ret[$key] = $value['value'];
+        }
+    }
+    return $ret;
 }
 
 function check_callback($debug, $value, $args)

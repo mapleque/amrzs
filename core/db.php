@@ -47,10 +47,10 @@ class DB
     /**
      * 统一format SQL，业务端只用关注数据
      * @param $tableName 更新表名
-     * @param $setParams 更新数据
-     * @param $whereCondition 更新条件
+     * @param $params 更新数据
+     * @return mixed
      */
-    public static function componentInsert($tableName,$params)
+    public static function componentInsert($tableName, $params)
     {
         $query = sprintf("INSERT INTO TABLE %s (%s) VALUES (%s)",
             $tableName, implode(",",array_keys($params)) , implode(",",array_fill(0,$params.length,"?"))
@@ -65,11 +65,12 @@ class DB
 
     /**
      * 统一format SQL，业务端只用关注数据
-     * @param $tableName 更新表名
-     * @param $setParams 更新数据
-     * @param $whereCondition 更新条件
+     * @param string $tableName 更新表名
+     * @param array $setParams 更新数据
+     * @param array $whereCondition 更新条件
+     * @return mixed
      */
-    public static function componentUpdate($tableName,$setParams,$whereCondition)
+    public static function componentUpdate($tableName, $setParams, $whereCondition)
     {
         $setSQL = "";
         $whereSQL = [];
