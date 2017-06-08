@@ -60,6 +60,17 @@ class Param
     {
         return self::wrap('|@check_enum_subset:$|', $prefix);
     }
+
+    public static function isIn($arr)
+    {
+        return self::wrap('|@check_in:$|', $arr);
+    }
+
+    public static function isSubset($arr)
+    {
+        return self::wrap('|@check_subset:$|', $arr);
+    }
+
     /**
      * @param string $expr
      * @param ...

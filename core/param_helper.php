@@ -168,6 +168,7 @@ function check_enum_subset($debug, $value, $args)
         }
         return false;
     }
+
     foreach ($constants as $k => $v) {
         if (strpos($k, $prefix) === 0) {
             foreach ($value as $vk => $vv) {
@@ -191,17 +192,86 @@ function check_enum_subset($debug, $value, $args)
     return false;
 }
 
+function check_in($debug, $value, $args)
+{
+    $arr = $args[0];
+    return in_array($value, $arr);
+}
+
+function check_subset($debug, $value, $args)
+{
+    $arr = $args[0];
+    $intersect = array_uintersect_uassoc($arr, $value, function($a, $b){
+        return $a === $b;
+    }, function($a, $b){
+        return true;
+    });
+    if (count($intersect) === count($value)) {
+        return true;
+    }
+    if ($debug) {
+        dump([
+            'msg' => 'check subset fail',
+            'arr' => $arr,
+            'value' => $value,
+        ]);
+    }
+    return false;
+}
+
 function check_sort($debug, $value, $args)
 {
+    $fields = $args[0];
+    foreach ($value as $k => $v) {
+        if (!in_array($k, $fields) || !is_bool($v)) {
+            if ($debug) {
+                dump([
+                    'msg' => 'check sort fail',
+                    'fields' => $fields,
+                    'value' => $value,
+                ]);
+            }
+            return false;
+        }
+    }
     return true;
 }
 
-function check_int_range()
+function check_int_range($debug, $value, $args)
 {
-    return true;
+    if (is_array($value)
+        && count($value) === 2
+        && is_int($value[0])
+        && is_int($value[1])
+    ) {
+        return true;
+    }
+    if ($debug) {
+        dump([
+            'msg' => 'check range fail',
+            'value' => $value,
+        ]);
+    }
+    return false;
 }
 
-function check_date_range()
+function check_date_range($debug, $value, $args)
 {
-    return true;
+    $dateFormat = '/^\d{4}-\d{2}-\d{2}$/';
+    if (is_array($value)
+        && count($value) === 2
+        && is_string($value[0])
+        && is_string($value[1])
+        && preg_match($dateFormat, $value[0])
+        && preg_match($dateFormat, $value[1])
+    ) {
+        return true;
+    }
+    if ($debug) {
+        dump([
+            'msg' => 'check date range fail',
+            'value' => $value,
+        ]);
+    }
+    return false;
 }
