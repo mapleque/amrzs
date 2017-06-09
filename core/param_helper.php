@@ -12,7 +12,7 @@ function trans_filter($debug, &$param, $ruleInfo, $parentKey)
         $expr = $field . ' IN (' . str_repeat('?', count($param)) . ')';
         $bind = $param;
     } elseif (strpos($ruleInfo['check'], 'range') !== false) {
-        $expr = $field . ' <= ? AND ' . $field . ' >= ?';
+        $expr = $field . ' >= ? AND ' . $field . ' <= ?';
         $bind = $param;
     }
     $param = [
