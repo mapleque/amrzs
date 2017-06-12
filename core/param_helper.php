@@ -18,6 +18,8 @@ function trans_filter($debug, &$param, $ruleInfo, $parentKey)
     $param = [
         'bind' => $bind,
         'expr' => $expr,
+        'table' => $table,
+        'alias' => $alias,
         'key' => $parentKey,
         'value' => $param,
     ];
