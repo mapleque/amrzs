@@ -172,7 +172,7 @@ class Param
             'optional' => false,
             'check' => null,
             'args' => [],
-            'code' => ERROR_SUCCESS,
+            'code' => ERROR_INVALID_REQUEST,
             'trans_args' => [],
             'trans' => null,
         ];
